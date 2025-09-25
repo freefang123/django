@@ -294,7 +294,6 @@ Authorization: Bearer <access_token>
 
 ### 4. Azure Blob存储
 
-**POST** `/api/blob/`
 
 **请求头**:
 ```

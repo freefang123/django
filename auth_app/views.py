@@ -97,11 +97,8 @@ def logout_view(request):
     POST /api/auth/logout
     """
     try:
-        refresh_token = request.data.get('refresh_token')
-        if refresh_token:
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-        
+        # 简单登出，不需要黑名单功能
+        # 客户端需要删除本地存储的token
         return Response({
             'success': True,
             'message': 'Logout successful'

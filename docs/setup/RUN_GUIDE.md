@@ -160,8 +160,6 @@ GET  /api/hello/           # 获取账户信息
 GET  /api/ok/              # 简单响应
 POST /api/multiprocessing/ # 多进程处理
 POST /api/threading/       # 多线程处理
-POST /api/blob/            # Azure Blob存储
-GET  /api/blob-url/        # 获取Blob下载链接
 POST /api/encrypt/         # 数据加密
 POST /api/decrypt/         # 数据解密
 GET  /api/panda/           # Pandas数据处理

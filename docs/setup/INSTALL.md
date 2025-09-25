@@ -102,7 +102,6 @@ python manage.py runserver
 | djangorestframework-simplejwt | 5.5.1 | JWT认证 |
 | mysqlclient | 2.2.7 | MySQL数据库驱动 |
 | pandas | 2.2.2 | 数据处理 |
-| azure-storage-blob | 12.20.0 | Azure云存储 |
 | cryptography | 43.0.3 | 加密功能 |
 
 ### 可选依赖

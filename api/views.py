@@ -8,33 +8,7 @@ from auth_app.serializers import AccountSerializer
 from utils.crypto_utils import encrypt_data, decrypt_data
 from utils.process_utils import run_multiprocessing_task, run_multithreading_task
 from utils.permission_utils import require_permission, require_group, require_superuser
-from services.azure_service import AzureBlobService
 from services.data_service import DataProcessingService
-
-# 初始化Azure服务
-azure_service = AzureBlobService(
-    connection_string=os.getenv('AZURE_STORAGE_CONNECTION_STRING', '')
-)
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def hello_api(request):
-    """
-    获取特定账户信息API（无需登录）
-    GET /api/hello/
-    """
-    try:
-        results = Account.objects.filter(name='TTW', age='22')
-        data = list(results.values())
-        return Response({
-            'success': True,
-            'data': data
-        }, status=status.HTTP_200_OK)
-    except Exception as e:
-        return Response({
-            'success': False,
-            'message': str(e)
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -64,20 +38,6 @@ def accounts_api(request):
             'success': False,
             'message': f'获取账户信息失败: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def ok_api(request):
-    """
-    简单响应API
-    GET /api/ok/?cit=value
-    """
-    cit = request.GET.get('cit')
-    return Response({
-        'success': True,
-        'message': 'ok, Django!',
-        'cit': cit
-    }, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

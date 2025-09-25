@@ -8,6 +8,12 @@ djangorestframework-simplejwt==5.5.1
 asgiref==3.9.1
 sqlparse==0.5.3
 
+# WebSocket and ASGI support
+channels==4.0.0
+channels-redis==4.1.0
+daphne==4.2.1
+websockets==15.0.1
+
 # Database
 mysqlclient==2.2.7
 

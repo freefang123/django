@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天API测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .api-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .api-section h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .endpoint {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #3498db;
+            font-family: monospace;
+        }
+        .method {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .get { background: #28a745; color: white; }
+        .post { background: #007bff; color: white; }
+        .delete { background: #dc3545; color: white; }
+        .description {
+            margin: 5px 0;
+            color: #666;
+        }
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .note strong {
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>聊天系统 API 接口文档</h1>
+        
+        <div class="note">
+            <strong>注意：</strong>所有接口都需要JWT认证，任何已登录的用户都可以访问聊天功能。
+            请先登录获取JWT token，然后在请求头中包含：<code>Authorization: Bearer &lt;your_token&gt;</code>
+        </div>
+
+        <div class="api-section">
+            <h3>🔐 认证</h3>
+            <div class="endpoint">
+                <span class="method post">POST</span> /api/token/
+                <div class="description">获取JWT token</div>
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span> /api/token/refresh/
+                <div class="description">刷新JWT token</div>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h3>🏠 房间管理</h3>
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/chat/rooms/
+                <div class="description">获取房间列表</div>
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span> /api/chat/rooms/
+                <div class="description">创建新房间</div>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/chat/rooms/{id}/
+                <div class="description">获取房间详情</div>
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span> /api/chat/rooms/{room_id}/join/
+                <div class="description">加入房间</div>
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span> /api/chat/rooms/{room_id}/leave/
+                <div class="description">离开房间</div>
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/chat/rooms/{room_id}/members/
+                <div class="description">获取房间成员</div>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h3>💬 消息管理</h3>
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/chat/rooms/{room_id}/messages/
+                <div class="description">获取房间消息（支持分页）</div>
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span> /api/chat/rooms/{room_id}/messages/
+                <div class="description">发送消息</div>
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span> /api/chat/messages/{message_id}/read/
+                <div class="description">标记消息已读</div>
+            </div>
+            <div class="endpoint">
+                <span class="method delete">DELETE</span> /api/chat/messages/{message_id}/delete/
+                <div class="description">删除消息（软删除）</div>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h3>🔔 通知管理</h3>
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/chat/notifications/
+                <div class="description">获取通知列表</div>
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span> /api/chat/notifications/{notification_id}/read/
+                <div class="description">标记通知已读</div>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h3>🔌 WebSocket 连接</h3>
+            <div class="endpoint">
+                <span class="method get">WS</span> ws://localhost:8000/ws/chat/{room_id}/
+                <div class="description">WebSocket实时通信连接</div>
+            </div>
+        </div>
+
+        <div class="api-section">
+            <h3>📝 请求示例</h3>
+            <h4>创建房间</h4>
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto;">
+POST /api/chat/rooms/
+Content-Type: application/json
+Authorization: Bearer &lt;your_jwt_token&gt;
+
+{
+    "name": "新房间",
+    "description": "房间描述",
+    "room_type": "public",
+    "max_members": 50
+}
+            </pre>
+
+            <h4>发送消息</h4>
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto;">
+POST /api/chat/rooms/1/messages/
+Content-Type: application/json
+Authorization: Bearer &lt;your_jwt_token&gt;
+
+{
+    "content": "大家好！",
+    "message_type": "text"
+}
+            </pre>
+
+            <h4>WebSocket消息格式</h4>
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto;">
+// 发送消息
+{
+    "type": "chat_message",
+    "content": "消息内容",
+    "message_type": "text"
+}
+
+// 接收消息
+{
+    "type": "chat_message",
+    "message": {
+        "id": 1,
+        "sender": {
+            "id": 1,
+            "username": "developer"
+        },
+        "content": "消息内容",
+        "created_at": "2024-01-01T12:00:00Z"
+    }
+}
+            </pre>
+        </div>
+
+        <div class="api-section">
+            <h3>🚀 快速开始</h3>
+            <ol>
+                <li>使用developer账户登录获取JWT token</li>
+                <li>使用token访问API接口</li>
+                <li>创建房间并加入</li>
+                <li>发送消息并建立WebSocket连接</li>
+                <li>处理实时消息和通知</li>
+            </ol>
+        </div>
+
+        <div class="note">
+            <strong>测试账户：</strong><br>
+            任何已注册的用户都可以使用聊天功能，包括：<br>
+            - admin用户<br>
+            - developer用户<br>
+            - 其他任何已登录的用户<br><br>
+            <strong>完整API文档：</strong><br>
+            请查看 <code>docs/chat/API_DOCUMENTATION.md</code> 获取详细的接口文档和示例代码。
+        </div>
+    </div>
+</body>
+</html>

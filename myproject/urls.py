@@ -27,6 +27,7 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('api/auth/', include('auth_app.urls')),
     path('api/permission/', include('permission_app.urls')),
+    path('api/chat/', include('chat_app.urls')),
     
     # JWT默认视图
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
