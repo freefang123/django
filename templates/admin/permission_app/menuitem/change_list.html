@@ -1,0 +1,276 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    .menu-tree-container {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .menu-tree-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #007cba;
+    }
+    
+    .menu-tree {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .menu-item {
+        margin: 5px 0;
+        padding: 8px 12px;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+    
+    .menu-item:hover {
+        background: #f8f9fa;
+        border-color: #007cba;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .menu-item-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .menu-item-info {
+        display: flex;
+        align-items: center;
+        flex: 1;
+    }
+    
+    .menu-item-icon {
+        font-size: 16px;
+        margin-right: 8px;
+    }
+    
+    .menu-item-title {
+        font-weight: bold;
+        color: #333;
+        margin-right: 10px;
+    }
+    
+    .menu-item-name {
+        color: #666;
+        font-size: 12px;
+        margin-right: 10px;
+    }
+    
+    .menu-item-meta {
+        color: #999;
+        font-size: 12px;
+    }
+    
+    .menu-item-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .menu-item-actions a {
+        color: #007cba;
+        text-decoration: none;
+        font-size: 12px;
+        padding: 2px 6px;
+        border: 1px solid #007cba;
+        border-radius: 3px;
+        transition: all 0.2s ease;
+    }
+    
+    .menu-item-actions a:hover {
+        background: #007cba;
+        color: white;
+    }
+    
+    .menu-children {
+        margin-left: 30px;
+        border-left: 2px solid #e9ecef;
+        padding-left: 15px;
+    }
+    
+    .menu-status-active {
+        color: #28a745;
+        font-weight: bold;
+    }
+    
+    .menu-status-inactive {
+        color: #dc3545;
+        font-weight: bold;
+    }
+    
+    .menu-type-badge {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 10px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    
+    .menu-type-menu {
+        background: #007cba;
+        color: white;
+    }
+    
+    .menu-type-submenu {
+        background: #28a745;
+        color: white;
+    }
+    
+    .menu-type-action {
+        background: #ffc107;
+        color: #333;
+    }
+    
+    .menu-order {
+        background: #6c757d;
+        color: white;
+        padding: 1px 4px;
+        border-radius: 2px;
+        font-size: 10px;
+    }
+    
+    .menu-tree-stats {
+        background: #e9ecef;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        font-size: 14px;
+        color: #666;
+    }
+    
+    .menu-tree-actions {
+        margin-bottom: 15px;
+    }
+    
+    .menu-tree-actions .button {
+        background: #007cba;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        margin-right: 10px;
+    }
+    
+    .menu-tree-actions .button:hover {
+        background: #0056b3;
+    }
+    
+    .menu-tree-actions .button.secondary {
+        background: #6c757d;
+    }
+    
+    .menu-tree-actions .button.secondary:hover {
+        background: #545b62;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="menu-tree-container">
+    <div class="menu-tree-title">
+        📋 菜单树状结构图
+    </div>
+    
+    <div class="menu-tree-stats">
+        <strong>统计信息:</strong>
+        总菜单数: {{ cl.result_count }} | 
+        激活菜单: {{ active_count }} | 
+        根菜单: {{ root_count }}
+    </div>
+    
+    <div class="menu-tree-actions">
+        <a href="{% url 'admin:permission_app_menuitem_add' %}" class="button">
+            ➕ 添加菜单
+        </a>
+        <a href="{% url 'admin:permission_app_menupermission_changelist' %}" class="button secondary">
+            🔐 菜单权限
+        </a>
+        <a href="{% url 'admin:permission_app_usermenulog_changelist' %}" class="button secondary">
+            📊 访问日志
+        </a>
+    </div>
+    
+    <div class="menu-tree">
+        {% for menu in menu_tree %}
+            <div class="menu-item">
+                <div class="menu-item-header">
+                    <div class="menu-item-info">
+                        <span class="menu-item-icon">
+                            {% if menu.menuitem_set.exists %}📁{% else %}📄{% endif %}
+                        </span>
+                        <span class="menu-item-title">{{ menu.title }}</span>
+                        <span class="menu-item-name">({{ menu.name }})</span>
+                        <span class="menu-type-badge menu-type-{{ menu.menu_type }}">
+                            {{ menu.menu_type }}
+                        </span>
+                        <span class="menu-order">#{{ menu.order }}</span>
+                        <span class="{% if menu.is_active %}menu-status-active{% else %}menu-status-inactive{% endif %}">
+                            {% if menu.is_active %}✅ 激活{% else %}❌ 禁用{% endif %}
+                        </span>
+                    </div>
+                    <div class="menu-item-actions">
+                        <a href="{% url 'admin:permission_app_menuitem_change' menu.id %}">编辑</a>
+                        <a href="{% url 'admin:permission_app_menuitem_delete' menu.id %}">删除</a>
+                        {% if menu.menuitem_set.exists %}
+                            <a href="{% url 'admin:permission_app_menuitem_changelist' %}?parent__id__exact={{ menu.id }}">子菜单</a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if menu.menuitem_set.exists %}
+                    <div class="menu-children">
+                        {% for child in menu.menuitem_set.all %}
+                            <div class="menu-item">
+                                <div class="menu-item-header">
+                                    <div class="menu-item-info">
+                                        <span class="menu-item-icon">📄</span>
+                                        <span class="menu-item-title">{{ child.title }}</span>
+                                        <span class="menu-item-name">({{ child.name }})</span>
+                                        <span class="menu-type-badge menu-type-{{ child.menu_type }}">
+                                            {{ child.menu_type }}
+                                        </span>
+                                        <span class="menu-order">#{{ child.order }}</span>
+                                        <span class="{% if child.is_active %}menu-status-active{% else %}menu-status-inactive{% endif %}">
+                                            {% if child.is_active %}✅ 激活{% else %}❌ 禁用{% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="menu-item-actions">
+                                        <a href="{% url 'admin:permission_app_menuitem_change' child.id %}">编辑</a>
+                                        <a href="{% url 'admin:permission_app_menuitem_delete' child.id %}">删除</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <div style="text-align: center; padding: 40px; color: #666;">
+                <p>📭 暂无菜单数据</p>
+                <a href="{% url 'admin:permission_app_menuitem_add' %}" class="button">
+                    创建第一个菜单
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}
